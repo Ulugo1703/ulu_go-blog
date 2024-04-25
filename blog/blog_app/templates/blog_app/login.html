@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Авторизация
+{% endblock %}
+
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Авторизация</legend>
+        {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+        </div>
+        {% endfor %}
+
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </fieldset>
+</form>
+{% endblock content %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Главная страница
+{% endblock %}
+
+{% block content %}
+<div class="row row-gap-4">
+    {% for article in articles %}
+    <div class="col-6">{% include 'includes/_article-item.html' %}</div>
+    {% empty %}
+    <h2 class="text-center">Nothing has been found</h2>
+    {% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{#<p class="text-center" style="font-size: larger;">{{ request.user }}</p>#}
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><b>Username:</b> <span>{{ request.user|title}}</span></li>
+    <li class="list-group-item"><b>Email:</b> <span>{{ request.user.email|title}}</span></li>
+    <li class="list-group-item"><b>Likes:</b> <span>{{likes}}</span></li>
+    <li class="list-group-item"><b>Views:</b> <span>{{views}}</span></li>
+    <li class="list-group-item"><b>Since:</b> <span>{{request.user.date_joined}} ({{days}})</span></li>
+</ul>
+<div class="row row-gap-4">
+    {% for article in articles %}
+    <div class="col-6">{% include 'includes/_article-item.html' %}</div>
+    {% endfor %}
+
+</div>
+{% endblock content %}

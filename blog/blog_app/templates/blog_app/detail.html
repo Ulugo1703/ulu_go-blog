@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Статья: {{ article.title }}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <img src="{{ article.get_image }}" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">{{ article.title }}</h5>
+        <p class="card-text">{{ article.full_description }}</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            Дата создания: <b>{{ article.created_at }}</b>
+        </li>
+        <li class="list-group-item">
+            Просмотры: <b>{{ article.views }}</b>
+        </li>
+        <li class="list-group-item">
+            Категория: <b>{{ article.category }}</b>
+        </li>
+        <li class="list-group-item">
+            Автор: <b>{{ article.author }}</b>
+        </li>
+    </ul>
+    <div class="card-body">
+        {% if request.user.is_authenticated and request.user == article.author %}
+        <div class="">
+            <a href="{% url 'update' article.pk %}" class="btn btn-warning">Изменить</a>
+            <a href="{% url 'delete' article.pk %}" class="btn btn-danger">Удалить</a>
+        </div>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user != article.author %}
+        <div class="">
+            <a href="{% url 'add_vote' 'article' article.pk 'add_like'  %}" class="btn btn-success fs-4">
+                <i class="bi bi-hand-thumbs-up"></i>
+                {{ likes }}
+            </a>
+            <a href="{% url 'add_vote' 'article' article.pk 'add_dislike'  %}" class="btn btn-danger fs-4">
+                <i class="bi bi-hand-thumbs-down"></i>
+                {{ dislikes }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="comments">
+    <h2 class="text-center my-3">Комментарии</h2>
+
+    <div>
+        {% for comment in comments %}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                {{ comment.created_at }}
+                {% if request.user == comment.author or request.user.is_superuser %}
+                <div>
+                    <a href="?reply_to={{ comment.pk }}" class="text-primary fs-4 text-decoration-none">
+                        <i class="bi bi-reply"></i>
+                    </a>
+                    <a href="{% url 'delete_comment' comment.pk %}" class="text-danger fs-4">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <p>{{ comment.text }}</p>
+                    <footer class="blockquote-footer">
+                        <cite title="{{ comment.author }}">{{ comment.author }}</cite>
+                    </footer>
+                </blockquote>
+            </div>
+            {% if comment.replied_comments.count > 0 %}
+            {% for replied in comment.replied_comments.all %}
+            <div class="card border-0 ps-5">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    {{ replied.created_at }}
+                </div>
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <p>{{ replied.text }}</p>
+                        <footer class="blockquote-footer">
+                            <cite title="{{ comment.author }}">{{ replied.author }}</cite>
+                        </footer>
+                    </blockquote>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        {% if 'reply_to' in request.GET %}
+        <input type="hidden" name="_comment_id" value="{{ request.GET.reply_to }}">
+        {% endif %}
+        <button class="btn btn-dark mt-2">Отправить</button>
+    </form>
+    {% else %}
+    <p>Только авторизованные пользователи могут оставлять комментарии</p>
+    <a href="{% url 'login' %}">Войти</a>
+    {% endif %}
+</div>
+{% endblock %}
